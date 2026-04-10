@@ -5,6 +5,7 @@ import { ArrowUpRight, ArrowDownLeft, Search, Filter } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { buildApiUrl } from "@/lib/api"
 
 type FilterType = "all" | "income" | "expense"
 
@@ -20,7 +21,7 @@ export function TransactionsPage() {
         const token = localStorage.getItem("token")
         const userId = localStorage.getItem("userId") // 🔥 CRITICAL
 
-        const res = await fetch("http://localhost:5000/api/transaction", {
+        const res = await fetch(buildApiUrl("/api/transaction"), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

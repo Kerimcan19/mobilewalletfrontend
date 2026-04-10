@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Send, Plus, ArrowUpRight, ArrowDownLeft, CreditCard } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { buildApiUrl } from "@/lib/api"
 
 interface WalletDashboardProps {
   onNavigate: (page: "wallet" | "transactions" | "transfer" | "settings") => void
@@ -18,7 +19,7 @@ export function WalletDashboard({ onNavigate }: WalletDashboardProps) {
       try {
         const token = localStorage.getItem("token")
 
-        const res = await fetch("http://localhost:5000/api/wallet", {
+        const res = await fetch(buildApiUrl("/api/wallet"), {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

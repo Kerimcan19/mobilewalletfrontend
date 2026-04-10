@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
+import { buildApiUrl } from "@/lib/api"
 
 type AuthUser = {
   email: string
@@ -68,9 +69,9 @@ export function AuthScreen({ onLogin }: AuthScreenProps) {
 
     try {
       const authUrl = isLogin
-        ? "http://localhost:5000/api/auth/login"
-        : "http://localhost:5000/api/auth/register"
-      const loginUrl = "http://localhost:5000/api/auth/login"
+        ? buildApiUrl("/api/auth/login")
+        : buildApiUrl("/api/auth/register")
+      const loginUrl = buildApiUrl("/api/auth/login")
 
       const payload = isLogin
         ? { email, password }

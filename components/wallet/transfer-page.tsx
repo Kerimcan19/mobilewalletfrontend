@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Textarea } from "@/components/ui/textarea"
+import { buildApiUrl } from "@/lib/api"
 
 const quickAmounts = [25, 50, 100, 250]
 
@@ -28,7 +29,7 @@ export function TransferPage() {
   useEffect(() => {
     const fetchWallet = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/wallet", {
+        const res = await fetch(buildApiUrl("/api/wallet"), {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -52,7 +53,7 @@ export function TransferPage() {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/transaction/transfer",
+        buildApiUrl("/api/transaction/transfer"),
         {
           method: "POST",
           headers: {
