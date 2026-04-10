@@ -1,4 +1,4 @@
-const RAW_API_BASE_URL = "https://mobilewalletbackend.vercel.app/"
+const RAW_API_BASE_URL = "https://mobilewalletbackend-atyu.vercel.app/"
 
 export const API_BASE_URL = RAW_API_BASE_URL.replace(/\/$/, "")
 
