@@ -7,8 +7,25 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldLabel } from "@/components/ui/field"
 
+type AuthUser = {
+  email: string
+  id: string
+  name: string
+}
+
+type AuthResponse = {
+  token?: string
+  user?: AuthUser
+  data?: {
+    token?: string
+    user?: AuthUser
+  }
+  accessToken?: string
+  message?: string
+}
+
 interface AuthScreenProps {
-  onLogin: (email: string) => void
+  onLogin: (user: AuthUser) => void
 }
 
 export function AuthScreen({ onLogin }: AuthScreenProps) {
@@ -18,16 +35,66 @@ export function AuthScreen({ onLogin }: AuthScreenProps) {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [name, setName] = useState("")
+
+  const getAuthPayload = (data: AuthResponse) => {
+    const token = data.token ?? data.accessToken ?? data.data?.token
+    const user = data.user ?? data.data?.user
+
+    return { token, user }
+  }
+
+  const authenticateUser = async (requestUrl: string, payload: Record<string, unknown>) => {
+    const res = await fetch(requestUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+
+    const data: AuthResponse = await res.json()
+
+    if (!res.ok) {
+      throw new Error(data.message || "Auth failed")
+    }
+
+    return getAuthPayload(data)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    
-    onLogin(email)
-    setIsLoading(false)
+
+    try {
+      const authUrl = isLogin
+        ? "http://localhost:5000/api/auth/login"
+        : "http://localhost:5000/api/auth/register"
+      const loginUrl = "http://localhost:5000/api/auth/login"
+
+      const payload = isLogin
+        ? { email, password }
+        : { name, email, password, confirmPassword }
+
+      let { token, user } = await authenticateUser(authUrl, payload)
+
+      if (!isLogin && (!token || !user)) {
+        ;({ token, user } = await authenticateUser(loginUrl, { email, password }))
+      }
+
+      if (!token || !user) {
+        throw new Error("Auth response is missing token or user")
+      }
+
+      localStorage.setItem("token", token)
+      localStorage.setItem("user", JSON.stringify(user))
+      onLogin(user)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Auth failed"
+      alert(message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -139,6 +206,21 @@ export function AuthScreen({ onLogin }: AuthScreenProps) {
                   </div>
                 </Field>
               )}
+              {!isLogin && (
+  <Field>
+    <FieldLabel>Name and Surname</FieldLabel>
+    <div className="relative">
+      <Input
+        type="text"
+        placeholder="Your name"
+        className="h-12 bg-muted/50 border-0"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+    </div>
+  </Field>
+)}
 
               {isLogin && (
                 <div className="text-right">
